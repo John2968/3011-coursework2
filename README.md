@@ -147,34 +147,44 @@ TOTAL coverage: 90%
 
 ## Git Workflow
 
-Recommended workflow for the coursework:
+This project uses `main` as the submission branch. The local history is still
+split into logical commits so the development process is clear in GitHub and in
+the video demonstration.
 
 ```powershell
 git init
-git checkout -b feature/search-engine-tool
+git branch -M main
 git add .
 git commit -m "chore: initialise coursework search tool structure"
 ```
 
 Then commit logical stages as the project develops, for example crawler,
-indexing, search, tests, and documentation. This gives a clear history to show
-in the video demonstration.
+indexing, search, tests, and documentation. In this repository, the final
+history already follows that staged structure.
 
 To connect this local project to GitHub in VSCode/Cursor:
 
-1. Create a new public repository on GitHub, without adding a README because
+1. Create a new empty public repository on GitHub, without adding a README because
    this project already has one.
 2. In VSCode/Cursor, open Source Control and sign in to GitHub if prompted.
-3. Add the remote URL in the terminal:
+3. Add or update the remote URL in the terminal:
 
 ```powershell
 git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
-git push -u origin feature/search-engine-tool
+git push -u origin main
 ```
 
-You can then create a pull request on GitHub or merge the branch into `main`.
-For Minerva, submit the public GitHub repository URL, the video link, and the
-compiled `data/index.json` file.
+If `origin` already exists, update it instead:
+
+```powershell
+git remote set-url origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
+git push -u origin main
+```
+
+After pushing, the GitHub repository's `main` branch should show `src/`,
+`tests/`, `README.md`, `VIDEO_SCRIPT.md`, and `data/index.json`. For Minerva,
+submit the public GitHub repository URL, the video link, and the compiled
+`data/index.json` file.
 
 ## GenAI Declaration and Reflection Notes
 
