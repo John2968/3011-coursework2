@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.cursor/
+COMP3011_Coursework2_Brief__2025_2026.pdf
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+*.egg-info/
+

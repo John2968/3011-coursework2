@@ -1,0 +1,7 @@
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = "--cov=src --cov-report=term-missing"
+markers = [
+    "performance: lightweight performance checks for indexing and search",
+]
+
