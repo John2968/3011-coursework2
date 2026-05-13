@@ -1,36 +1,40 @@
-# COMP3011 Coursework 2: Search Engine Tool
+﻿# COMP3011 Search Engine Tool
 
-This repository contains a Python command-line search tool for
-[`https://quotes.toscrape.com/`](https://quotes.toscrape.com/). The program
-crawls the target website, builds an inverted index with word-level statistics,
-saves the compiled index as JSON, and supports interactive search commands over
-the saved data.
+A Python command-line search tool for
+[`quotes.toscrape.com`](https://quotes.toscrape.com/). The application crawls
+the quote listing pages, builds an inverted index with word statistics, stores
+the compiled index as JSON, and supports interactive search over the saved
+index.
 
-The implementation is designed for COMP3011 Coursework 2 and focuses on the
-required search engine workflow: crawling, indexing, persistent storage, query
-processing, testing, and clear documentation of design decisions.
+The project demonstrates the main components of a small search engine:
+
+- polite web crawling
+- HTML parsing
+- tokenisation and normalisation
+- inverted index construction
+- persistent index storage
+- command-line query processing
+- ranked multi-term search
+- automated testing
 
 ## Features
 
-- Crawls the paginated quote pages from `quotes.toscrape.com`.
-- Enforces a default 6 second politeness window between HTTP requests.
-- Parses quote text, authors, and tags with Beautiful Soup.
-- Falls back to page-level text extraction if expected quote elements are not
-  present.
+- Crawls the paginated quote pages from `https://quotes.toscrape.com/`.
+- Uses a default 6 second politeness window between HTTP requests.
+- Extracts quote text, authors, and tags with Beautiful Soup.
+- Falls back to page-level text extraction if the expected quote layout is not available.
 - Builds a case-insensitive inverted index.
-- Stores document frequency, term frequency, word positions, document length,
-  URL, title, and preview text.
+- Stores document frequency, term frequency, token positions, document length, URL, title, and preview text.
 - Saves and loads the compiled index from `data/index.json`.
-- Supports the required `build`, `load`, `print`, and `find` commands.
-- Handles empty queries, missing words, missing index files, malformed commands,
-  and network request failures gracefully.
-- Ranks matching pages with a BM25-style score for multi-word search results.
-- Includes automated unit, integration, CLI, and performance tests.
+- Supports `build`, `load`, `print`, `find`, `help`, and `exit` in an interactive shell.
+- Handles missing index files, empty queries, unknown commands, missing command arguments, missing words, and request failures with readable messages.
+- Uses a BM25-style ranking score for matched search results.
+- Includes unit, integration, command-level, and performance tests.
 
 ## Project Structure
 
 ```text
-coursework2/
+3011-coursework2/
   src/
     __init__.py
     crawler.py
@@ -56,9 +60,9 @@ coursework2/
 
 ## Installation
 
-Python 3.12 was used during development and testing.
+Python 3.12 was used for development and testing.
 
-Create and activate a virtual environment on Windows PowerShell:
+Create a virtual environment and install dependencies:
 
 ```powershell
 python -m venv .venv
@@ -66,143 +70,133 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Alternatively, install the dependencies directly into the active Python
-environment:
+The runtime dependencies are:
 
-```powershell
-python -m pip install -r requirements.txt
-```
+- `requests`
+- `beautifulsoup4`
 
-The runtime dependencies are `requests` and `beautifulsoup4`. The test
-dependencies are `pytest` and `pytest-cov`.
+The test dependencies are:
 
-## Running the Search Tool
+- `pytest`
+- `pytest-cov`
 
-Start the interactive command-line interface from the repository root:
+## Running the Application
+
+Start the interactive shell from the repository root:
 
 ```powershell
 python -m src.main
 ```
 
-The prompt accepts the following commands:
+The default index file path is `data/index.json`. A custom index path can be provided with:
+
+```powershell
+python -m src.main --index-path path/to/index.json
+```
+
+## Command Reference
+
+The shell accepts command syntax rather than a fixed set of example queries.
+
+`build`
+
+Crawls the target website, builds a new inverted index, saves it to disk, and loads it into memory. Because the crawler follows a 6 second politeness window, a full live build intentionally takes time.
+
+`load`
+
+Loads a previously saved index file from disk. This allows searching without crawling the website again.
+
+`print <word>`
+
+Prints the posting list for one word. The output includes document frequency, page URLs, term frequency within each page, and token positions.
+
+`find <query terms>`
+
+Searches for pages containing all query terms. Matching is case-insensitive. Results are ordered by a BM25-style relevance score and include page URL, score, per-term frequencies, and preview text.
+
+`help`
+
+Displays the available shell commands.
+
+`exit`
+
+Closes the interactive shell.
+
+## Example Session
+
+The following session shows typical usage. The exact number of unique terms may change if the website content or tokenisation rules change.
 
 ```text
 > build
-> load
-> print nonsense
-> find indifference
-> find good friends
-> help
-> exit
-```
-
-The index path can be changed with:
-
-```powershell
-python -m src.main --index-path data/index.json
-```
-
-## Command Behaviour
-
-`build` crawls the target website, constructs the inverted index, saves it to
-`data/index.json`, and loads the new index into memory. A live build is expected
-to take time because the crawler waits at least 6 seconds between successive
-requests.
-
-Example successful build output:
-
-```text
 Built index from 10 page(s).
 Indexed 849 unique term(s).
 Saved index to data\index.json.
-```
 
-`load` reads the saved index from disk and makes it available for `print` and
-`find` without crawling the website again.
-
-Example:
-
-```text
 > load
 Loaded index from data\index.json.
 10 page(s), 849 unique term(s).
-```
 
-`print <word>` displays the posting list for one normalised term. The output
-includes document frequency, page URL, term frequency in each page, and token
-positions.
-
-Example:
-
-```text
 > print nonsense
 Term: nonsense
 Document frequency: 1
 - https://quotes.toscrape.com/page/6/ | freq=1 | positions=[...]
-```
 
-`find <query...>` searches for pages containing all query terms. Query matching
-is case-insensitive. Results are ranked by relevance and include a score,
-per-term frequencies, URL, and document preview.
-
-Example:
-
-```text
 > find good friends
 Results for: good friends
-1. https://quotes.toscrape.com/page/1/
+1. https://quotes.toscrape.com/...
    score=...
+   good=..., friends=...
    ...
+```
+
+Examples of valid search commands include:
+
+```text
+> find indifference
+> find good friends
+> find GOOD Friends
+> print love
+> print truth
 ```
 
 ## Architecture
 
-The implementation separates crawling, indexing, persistence, query processing,
-and the user interface into independent modules.
+The implementation is separated into small modules with clear responsibilities.
 
-```text
-main.py
-  - interactive command shell
-  - command parsing and user-facing messages
+`src/crawler.py`
 
-crawler.py
-  - polite HTTP requests
-  - pagination discovery
-  - HTML parsing and fallback extraction
+Implements `QuotesCrawler`, which performs polite HTTP requests, follows pagination, parses HTML with Beautiful Soup, extracts quote content, and handles request failures.
 
-indexer.py
-  - tokenisation and normalisation
-  - inverted index construction
-  - term frequency and position recording
+`src/indexer.py`
 
-storage.py
-  - JSON save/load
-  - schema version validation
-  - readable storage format for submission
+Implements tokenisation, normalisation, document ID generation, preview generation, and inverted index construction.
 
-search.py
-  - posting list lookup
-  - multi-term AND matching
-  - BM25-style ranking
-  - formatted result output
+`src/search.py`
 
-models.py
-  - dataclasses for crawled pages, documents, postings, index entries, and
-    search results
-```
+Implements query normalisation, posting-list lookup, multi-term AND matching, BM25-style scoring, and formatted search output.
+
+`src/storage.py`
+
+Handles JSON persistence for the compiled index and validates the stored schema version when loading.
+
+`src/main.py`
+
+Provides the interactive command-line interface and connects the crawler, indexer, storage layer, and search engine.
+
+`src/models.py`
+
+Defines dataclasses for crawled pages, documents, postings, term entries, complete indexes, and ranked search results.
 
 ## Inverted Index Design
 
-The compiled index is stored in JSON so that it can be submitted and inspected
-directly. The main sections are:
+The index is stored as readable JSON in `data/index.json`. Its main sections are:
 
-- `metadata`: schema version, source site, creation timestamp, document count,
-  and average document length.
-- `documents`: document ID to URL, title, preview, and token count.
-- `terms`: normalised term to document frequency and posting list.
-- `postings`: document-specific frequency and word positions for a term.
+- `metadata`: schema version, source site, creation timestamp, document count, and average document length.
+- `documents`: document IDs mapped to URL, title, preview text, and token count.
+- `terms`: normalised words mapped to document frequency and postings.
+- `postings`: per-document term frequency and token positions for each word.
 
-A simplified structure is:
+Simplified structure:
 
 ```json
 {
@@ -233,31 +227,35 @@ A simplified structure is:
 }
 ```
 
-This design gives direct lookup for `print <word>` and efficient multi-word
-search by intersecting posting-list document IDs. Storing positions makes the
-index more informative than a simple word-to-page mapping and supports clear
-explanation of how each word appears in each page.
+This structure supports direct lookup for `print <word>` and efficient multi-term search by intersecting posting-list document IDs. Storing token positions provides more detail than a simple word-to-URL mapping and makes the index easier to inspect and explain.
 
 ## Search Strategy
 
-Input text is normalised by lowercasing and tokenising alphanumeric words. This
-makes searches case-insensitive, so `Good`, `good`, and `GOOD` are treated as
-the same term.
+Input text is lowercased and tokenised with a regular expression that keeps alphanumeric words and simple apostrophe forms. Searches are therefore case-insensitive.
 
-Multi-word queries use AND semantics: a page is returned only when it contains
-all query terms. Matching pages are ranked with a BM25-style score based on term
-frequency, document frequency, document length, and average document length.
-This improves result ordering while keeping the ranking formula compact enough
-to explain in the video demonstration.
+Multi-term queries use AND semantics: a page must contain every query term to appear in the results. Matching pages are ranked using a BM25-style score based on:
+
+- term frequency in the document
+- document frequency across the collection
+- document length
+- average document length
+
+The ranking layer is intentionally compact: it improves result ordering while remaining understandable for a small coursework search engine.
 
 ## Error Handling
 
-The crawler catches request exceptions and stops gracefully if repeated attempts
-fail. The command-line interface returns user-readable messages for invalid
-commands, empty queries, missing command arguments, unloaded indexes, and
-missing or invalid index files.
+The application uses defensive checks around common failure cases:
 
-Examples:
+- request timeouts and HTTP errors during crawling
+- missing or invalid index files during loading
+- unsupported index schema versions
+- empty commands
+- unknown commands
+- missing arguments for `print` and `find`
+- searches before an index has been built or loaded
+- terms that do not exist in the index
+
+Example messages:
 
 ```text
 > find
@@ -272,41 +270,37 @@ No pages found containing all terms: wordthatdoesnotexist
 
 ## Testing
 
-The test suite can be run with:
+Run the test suite with coverage:
 
 ```powershell
 python -m pytest
 ```
 
-The local test result after implementation was:
+Current local result:
 
 ```text
 19 passed
 TOTAL coverage: 90%
 ```
 
-Test coverage is above the 85% target stated in the very good grade band. The
-tests focus on meaningful behaviour rather than only increasing line coverage.
+The tests cover:
 
-Test areas:
+- crawler pagination and HTML extraction
+- crawler fallback parsing and request failure handling
+- tokenisation and case-insensitive indexing
+- term frequency, document frequency, and token positions
+- JSON save/load behaviour
+- missing files, invalid JSON, and schema validation
+- single-term and multi-term search
+- empty and missing query handling
+- command-level behaviour for `build`, `load`, `print`, `find`, `help`, and `exit`
+- lightweight performance over 300 simulated pages
 
-- `tests/test_crawler.py`: pagination, quote extraction, fallback text parsing,
-  request failure handling, and crawler configuration validation.
-- `tests/test_indexer.py`: tokenisation, case-insensitivity, document metadata,
-  frequency counts, positions, and empty page handling.
-- `tests/test_storage.py`: JSON save/load round trips, missing files, invalid
-  JSON, and schema version checks.
-- `tests/test_search.py`: single-term search, multi-term AND search, missing
-  terms, empty queries, posting-list explanation, and unloaded index errors.
-- `tests/test_main.py`: command-level integration for `build`, `load`, `print`,
-  `find`, `help`, `exit`, and invalid states.
-- `tests/test_performance.py`: lightweight indexing and search performance over
-  300 simulated pages.
+The crawler tests use mocked HTTP responses so the automated suite does not depend on live network availability or the 6 second politeness delay.
 
-## Git History
+## Development History
 
-The repository history is organised as staged commits to show logical
-development progression:
+The Git history is organised into staged semantic commits:
 
 ```text
 chore: initialise coursework search tool structure
@@ -317,64 +311,12 @@ test: expand coverage and performance checks
 docs: document architecture and demonstration plan
 ```
 
-The intended submission branch is `main`. For a new empty GitHub repository,
-the local project can be connected and pushed with:
+This progression reflects the main implementation stages: project setup, crawling, indexing and storage, search and CLI behaviour, tests, and documentation.
 
-```powershell
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
-git push -u origin main
-```
+## GenAI Use
 
-If a remote named `origin` already exists:
+Generative AI assistance was used during development for planning, initial code drafting, test case suggestions, debugging support, and documentation drafting. The implementation was checked against the coursework requirements through manual review, command-line testing, automated tests, and inspection of the generated `data/index.json` file.
 
-```powershell
-git remote set-url origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
-git push -u origin main
-```
+The main benefits were faster exploration of design options and broader test case generation. The main limitations were the need to verify generated code against the exact requirements and to test edge cases explicitly, such as empty queries, missing index files, network failures, and schema validation.
 
-## GenAI Use Declaration
-
-Generative AI assistance was used during development. The main uses were:
-
-- Interpreting the coursework brief and converting the requirements into a
-  modular implementation plan.
-- Drafting initial versions of the crawler, indexer, search, storage, CLI, and
-  test files.
-- Suggesting edge cases for the automated test suite.
-- Improving documentation structure and preparing video explanation material.
-
-The generated suggestions were checked against the coursework requirements and
-validated through local testing. Several design decisions were made or verified
-during review, including using a JSON index for inspectability, enforcing the
-6 second politeness window in the crawler, storing word positions rather than
-only page URLs, and using mocked crawler tests so that automated tests do not
-depend on live network access.
-
-The main benefit of GenAI was faster movement from the brief to a working
-project structure. The main limitation was that generated code still required
-manual validation: behaviour such as empty query handling, missing index files,
-network failures, and schema validation had to be tested explicitly. The final
-implementation was reviewed through the test suite, manual command-line runs,
-and inspection of the generated `data/index.json` file.
-
-## Submission Artifacts
-
-The coursework submission consists of:
-
-- Public GitHub repository URL containing the source code, tests, documentation,
-  and generated index file.
-- Video demonstration link, no longer than 5 minutes.
-- Compiled index file: `data/index.json`.
-
-The recommended video evidence is:
-
-- Run `python -m pytest` and show the passing tests and coverage.
-- Start the tool with `python -m src.main`.
-- Demonstrate `load`, `print nonsense`, `find indifference`, and
-  `find good friends`.
-- Demonstrate at least one edge case such as `find` or
-  `find wordthatdoesnotexist`.
-- Show the staged Git history with `git log --oneline --decorate --graph`.
-- Explain the role of GenAI critically, including both benefits and limitations.
-
+The final implementation keeps the core search engine concepts visible in the code: crawling, tokenisation, posting lists, word positions, persistent storage, and ranked retrieval.
