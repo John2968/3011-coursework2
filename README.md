@@ -55,7 +55,6 @@ The project demonstrates the main components of a small search engine:
   requirements.txt
   pyproject.toml
   README.md
-  VIDEO_SCRIPT.md
 ```
 
 ## Installation
