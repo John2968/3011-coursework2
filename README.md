@@ -348,6 +348,19 @@ suite also needed manual review because generated tests can miss edge cases or
 test only the expected path. Mocked crawler tests were added so the automated
 tests would not depend on live network access or wait for the politeness delay.
 
+The quality of AI-generated code was mixed. Some suggestions were useful as a
+starting point, but correctness depended on checking the details against the
+brief. For example, a crawler that simply requests pages quickly would be
+functionally simple but would not satisfy the required politeness window.
+Similarly, an index that only stores page URLs would not be sufficient because
+the coursework asks for word statistics such as frequency and position.
+
+The main debugging challenge was distinguishing code that looked plausible from
+code that fully met the specification. This was handled by running the command-
+line tool manually, adding tests for edge cases, and inspecting the stored JSON
+index to confirm that the generated data matched the intended inverted-index
+structure.
+
 Using GenAI improved development speed and helped with time management, but it
 also created an extra responsibility to understand and validate the generated
 code. The learning benefit came from checking why each part was needed: how

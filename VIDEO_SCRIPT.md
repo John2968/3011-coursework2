@@ -98,7 +98,9 @@ positions, and that multi-word queries work through posting-list intersection.
 One limitation was that some AI suggestions were too generic, so I had to adapt
 them to the exact website and command requirements. AI also suggested useful
 tests, but I still had to add and verify edge cases such as empty queries,
-missing files, and network failures. Overall, GenAI improved my time management,
-but it also forced me to review, test, and understand the implementation rather
-than simply accepting generated code."
+missing files, and network failures. The main challenge was that generated code
+could look plausible before it was tested, so I had to inspect the JSON index and
+run the commands myself. Overall, GenAI improved my time management, but it also
+forced me to review, test, and understand the implementation rather than simply
+accepting generated code."
 
