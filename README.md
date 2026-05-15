@@ -315,8 +315,38 @@ This progression reflects the main implementation stages: project setup, crawlin
 
 ## GenAI Use
 
-Generative AI assistance was used during development for planning, initial code drafting, test case suggestions, debugging support, and documentation drafting. The implementation was checked against the coursework requirements through manual review, command-line testing, automated tests, and inspection of the generated `data/index.json` file.
+Generative AI assistance was used during development. The main tool used was
+Cursor with GPT-based chat and coding assistance. It was used for requirements
+analysis, project planning, initial code drafting, test case suggestions,
+debugging support, and documentation drafting.
 
-The main benefits were faster exploration of design options and broader test case generation. The main limitations were the need to verify generated code against the exact requirements and to test edge cases explicitly, such as empty queries, missing index files, network failures, and schema validation.
+AI support was useful at the planning stage because it helped convert the
+coursework brief into a modular structure with separate crawler, indexer,
+storage, search, command-line, and test components. It also helped identify
+important behaviours to test, such as empty queries, missing index files,
+network request failures, and schema validation.
 
-The final implementation keeps the core search engine concepts visible in the code: crawling, tokenisation, posting lists, word positions, persistent storage, and ranked retrieval.
+The AI-generated suggestions were not accepted without review. The code was
+checked against the coursework requirements through manual inspection,
+command-line runs, automated tests, and inspection of the generated
+`data/index.json` file. Particular attention was given to verifying that the
+crawler respects the 6 second politeness window, that the index stores term
+frequency and token positions rather than only page URLs, and that the `find`
+command handles multi-word queries correctly.
+
+There were also limitations. Some AI suggestions were too generic and needed to
+be adapted to the exact coursework website and command requirements. The test
+suite also needed manual review because generated tests can miss edge cases or
+test only the expected path. Mocked crawler tests were added so the automated
+tests would not depend on live network access or wait for the politeness delay.
+
+Using GenAI improved development speed and helped with time management, but it
+also created an extra responsibility to understand and validate the generated
+code. The learning benefit came from checking why each part was needed: how
+Beautiful Soup extracts HTML elements, why an inverted index supports efficient
+lookup, how posting-list intersections support multi-word search, and how BM25-
+style ranking uses term frequency, document frequency, and document length.
+
+The final implementation keeps the core search engine concepts visible in the
+code: crawling, tokenisation, posting lists, word positions, persistent storage,
+and ranked retrieval.

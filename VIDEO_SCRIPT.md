@@ -88,13 +88,17 @@ indexing/search, tests, documentation, and generated index.
 
 Suggested concise reflection:
 
-"I used Cursor/GPT as an assistant for planning the architecture, generating
-initial code, and suggesting tests. It helped me move quickly from the brief to
-a modular structure, but I still had to verify the suggestions against the
-requirements. For example, I checked that the crawler really respects the 6
-second politeness window and that the index stores frequency and positions, not
-just words. The most useful part was using AI to identify edge cases for tests.
-The limitation was that AI-generated code can look correct before it is tested,
-so running coverage and reading the generated index were important for my own
-understanding."
+"I used Cursor with GPT-based assistance for planning the architecture, drafting
+initial code, suggesting tests, debugging, and improving documentation. It
+helped me move faster from the brief to a modular structure with separate
+crawler, indexer, storage, search, and test components. However, I did not treat
+the AI output as automatically correct. I checked that the crawler respects the
+6 second politeness window, that the inverted index stores frequency and token
+positions, and that multi-word queries work through posting-list intersection.
+One limitation was that some AI suggestions were too generic, so I had to adapt
+them to the exact website and command requirements. AI also suggested useful
+tests, but I still had to add and verify edge cases such as empty queries,
+missing files, and network failures. Overall, GenAI improved my time management,
+but it also forced me to review, test, and understand the implementation rather
+than simply accepting generated code."
 
