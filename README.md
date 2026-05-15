@@ -279,11 +279,14 @@ python -m pytest
 Current local result:
 
 ```text
-19 passed
+20 passed
 TOTAL coverage: 90%
 ```
 
-The tests cover:
+The testing strategy combines unit tests, integration-style command tests, and a
+lightweight performance test.
+
+Unit tests cover:
 
 - crawler pagination and HTML extraction
 - crawler fallback parsing and request failure handling
@@ -293,8 +296,13 @@ The tests cover:
 - missing files, invalid JSON, and schema validation
 - single-term and multi-term search
 - empty and missing query handling
-- command-level behaviour for `build`, `load`, `print`, `find`, `help`, and `exit`
-- lightweight performance over 300 simulated pages
+
+Integration-style tests cover the command-level behaviour for `build`, `load`,
+`print`, `find`, `help`, and `exit` through the `SearchTool` command handler.
+
+The performance test builds and searches an index over 300 simulated pages to
+check that indexing and query processing remain fast for a larger in-memory
+dataset than the live target site.
 
 The crawler tests use mocked HTTP responses so the automated suite does not depend on live network availability or the 6 second politeness delay.
 
