@@ -102,6 +102,35 @@ def test_crawl_stops_gracefully_after_request_failures() -> None:
     assert crawler.crawl() == []
 
 
+def test_retry_respects_politeness_after_failed_request() -> None:
+    class FlakySession:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def get(self, url: str, timeout: float) -> FakeResponse:
+            self.calls += 1
+            if self.calls == 1:
+                raise requests.ConnectionError("temporary connection problem")
+            return FakeResponse(PAGE_ONE)
+
+    clock_values = iter([0.0, 1.0, 7.0])
+    sleeps: list[float] = []
+    session = FlakySession()
+    crawler = QuotesCrawler(
+        session=session,
+        politeness_window=6,
+        retries=1,
+        sleep_func=sleeps.append,
+        clock=lambda: next(clock_values),
+    )
+
+    pages = crawler.crawl(max_pages=1)
+
+    assert len(pages) == 1
+    assert session.calls == 2
+    assert sleeps == [5.0]
+
+
 def test_crawler_rejects_invalid_configuration() -> None:
     try:
         QuotesCrawler(politeness_window=-1)

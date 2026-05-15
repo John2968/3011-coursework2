@@ -82,6 +82,7 @@ class QuotesCrawler:
                 response.raise_for_status()
                 return response.text
             except requests.RequestException as exc:
+                self._last_request_at = self.clock()
                 LOGGER.warning("Request failed for %s on attempt %s: %s", url, attempt + 1, exc)
                 if attempt >= self.retries:
                     return None
