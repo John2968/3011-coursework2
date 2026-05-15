@@ -89,6 +89,7 @@ class QuotesCrawler:
         return None
 
     def _respect_politeness(self) -> None:
+        # The coursework requires at least a 6 second gap between live requests.
         if self._last_request_at is None or self.politeness_window == 0:
             return
         elapsed = self.clock() - self._last_request_at
@@ -135,6 +136,7 @@ class QuotesCrawler:
     def _extract_next_url(soup: BeautifulSoup, current_url: str) -> str | None:
         next_link = soup.select_one("li.next a")
         if next_link is None:
+            # Fallback for small HTML structure changes around the pagination link.
             for link in soup.find_all("a"):
                 if link.get_text(" ", strip=True).lower() == "next":
                     next_link = link

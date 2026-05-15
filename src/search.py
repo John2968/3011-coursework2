@@ -50,6 +50,7 @@ class SearchEngine:
                 return []
             posting_sets.append(set(entry.postings))
 
+        # AND search: only documents appearing in every posting list can match.
         matching_doc_ids = set.intersection(*posting_sets) if posting_sets else set()
         results = [
             SearchResult(
@@ -136,6 +137,7 @@ class SearchEngine:
         for term, query_frequency in query_counts.items():
             entry = index.terms[term]
             posting = entry.postings[doc_id]
+            # BM25-style IDF reduces the impact of words that appear in many pages.
             idf = math.log(
                 1
                 + (index.document_count - entry.doc_freq + 0.5)

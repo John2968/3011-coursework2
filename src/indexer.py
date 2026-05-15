@@ -57,6 +57,7 @@ class InvertedIndexBuilder:
             entry = index.terms.setdefault(token, TermEntry())
             posting = entry.postings.setdefault(doc_id, Posting(doc_id=doc_id))
             posting.add_position(position)
+            # Document frequency counts a term once per document, not once per token.
             if token not in seen_terms:
                 entry.doc_freq += 1
                 seen_terms.add(token)
